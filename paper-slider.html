@@ -103,7 +103,7 @@ To change the slider secondary progress bar color:
   </div>
 
   <template if="{{editable}}">
-    <paper-input id="input" class="slider-input" disabled?="{{disabled}}" on-change="{{inputChange}}"></paper-input>
+    <paper-input id="input" class="slider-input" value="{{editValue}}" disabled?="{{disabled}}" on-change="{{inputChange}}" on-blur="{{handleBlur}}"></paper-input>
   </template>
 
 </template>
@@ -200,6 +200,13 @@ To change the slider secondary progress bar color:
      */
     dragging: false,
 
+    /**
+     * An intermediate value for when the user is editing the slider value via the input field.
+     * The value change is only sent on blur, rather than each keystroke.
+     * @type number
+     */
+    editValue: undefined,
+
     observe: {
       'step snaps': 'update'
     },
@@ -241,10 +248,12 @@ To change the slider secondary progress bar color:
       if (!this.dragging) {
         this.value = this.immediateValue;
       }
-      if (this.editable) {
-        this.$.input.value = this.immediateValue;
-      }
+      this.editValue = this.immediateValue;
       this.fire('immediate-value-change');
+    },
+
+    handleBlur: function() {
+      this.value = parseInt(this.editValue);
     },
 
     expandKnob: function() {
